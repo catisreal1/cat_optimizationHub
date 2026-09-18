@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Optimization Hub",
-   LoadingTitle = "load Hub ",
+   Name = "Optimization Hub v0.6 | cat_isreal",
+   LoadingTitle = "đg tải ",
    LoadingSubtitle = "by cat_isreal",
    ConfigurationSaving = {
       Enabled = false,
@@ -16,51 +16,90 @@ local FPSTab = Window:CreateTab("FPS Boost", 4483362458)
 local NetworkTab = Window:CreateTab("Mạng & Ping", 4483362458)
 local UtilityTab = Window:CreateTab("Tiện ích", 4483362458)
 
-FPSTab:CreateSection(" Potato gra ")
+FPSTab:CreateSection("potato gra")
 
 FPSTab:CreateToggle({
-   Name = "Bật Potato Graphics (Xóa vật thể rác, giảm tải tối đa)",
+   Name = "Ultimate Potato (Xóa mọi thứ?)",
    CurrentValue = false,
-   Flag = "PotatoToggle",
+   Flag = "UltimatePotatoToggle",
    Callback = function(Value)
-      local Lighting = game:GetService("Lighting")
       local Workspace = game:GetService("Workspace")
+      local Lighting = game:GetService("Lighting")
+      local Players = game:GetService("Players")
       local Terrain = Workspace:FindFirstChildOfClass("Terrain")
       
       if Value then
          pcall(function()
             Lighting.GlobalShadows = false
+            Lighting.Brightness = 1
             Lighting.FogEnd = 9e9
-            Lighting.Brightness = 0
+            Lighting.FogStart = 9e9
+            Lighting.ClockTime = 12
+            Lighting.Technology = Enum.Technology.Compatibility
+
             for _, v in ipairs(Lighting:GetChildren()) do
-               if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") then
-                  v.Enabled = false
+               if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("SunRaysEffect") then
+                  v:Destroy()
                end
             end
-            
+
             if Terrain then
                Terrain.WaterWaveSize = 0
-               Terrain.WaterWaveTransparency = 1
-               Terrain.WaterTransparency = 0
+               Terrain.WaterWaveSpeed = 0
+               Terrain.WaterReflectance = 0
+               Terrain.WaterTransparency = 1
+               pcall(function()
+                  sethiddenproperty(Terrain, "Decoration", false)
+               end)
             end
-            
-            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-            
-            for _, obj in ipairs(Workspace:GetDescendants()) do
-               if obj:IsA("BasePart") then
-                  obj.Material = Enum.Material.SmoothPlastic
-                  obj.Reflectance = 0
-                  if obj.Transparency < 0.1 and obj.Size.Magnitude < 3 then
-                     obj.Transparency = 0.5
-                  end
-               elseif obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") or obj:IsA("Trail") or obj:IsA("Beam") then
-                  obj.Enabled = false
-               elseif obj:IsA("Decal") or obj:IsA("Texture") then
-                  obj.Transparency = 1
+
+            local function stripPart(part)
+               if part:IsA("BasePart") then
+                  part.CastShadow = false
+                  part.Material = Enum.Material.SmoothPlastic
+                  part.Reflectance = 0
+                  part.Color = Color3.fromRGB(150, 150, 150)
+               elseif part:IsA("Decal") or part:IsA("Texture") then
+                  part.Transparency = 1
+               elseif part:IsA("ParticleEmitter") or part:IsA("Fire") or part:IsA("Smoke") or part:IsA("Sparkles") or part:IsA("Trail") or part:IsA("Beam") then
+                  part.Enabled = false
+                  part.Parent = nil
                end
             end
+
+            for _, descendant in ipairs(Workspace:GetDescendants()) do
+               stripPart(descendant)
+            end
+            Workspace.DescendantAdded:Connect(stripPart)
+
+            local function optimizeCharacter(char)
+               char.DescendantAdded:Connect(function(child)
+                  if child:IsA("ParticleEmitter") or child:IsA("Trail") or child:IsA("Beam") or child:IsA("Highlight") then
+                     task.defer(function()
+                        if child and child.Parent then
+                           child:Destroy()
+                        end
+                     end)
+                  end
+               end)
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+               if player.Character then
+                  optimizeCharacter(player.Character)
+               end
+               player.CharacterAdded:Connect(optimizeCharacter)
+            end
+
+            Players.PlayerAdded:Connect(function(player)
+               player.CharacterAdded:Connect(optimizeCharacter)
+            end)
+
+            local userSettings = UserSettings():GetService("UserGameSettings")
+            userSettings.SavedQualityLevel = Enum.SavedQualityLevel.Level1
+            userSettings.GraphicsQualityLevel = 1
          end)
-         Rayfield:Notify({Title = "Potato Mode", Content = "xong r giờ chs đi lag thì góp í thêm", Duration = 3})
+         Rayfield:Notify({Title = "Ultimate Potato", Content = "sài đc mà nếu cần gì thì góp í thêm", Duration = 3})
       else
          Rayfield:Notify({Title = "Thông báo", Content = "Hãy join lại game để khôi phục đồ họa gốc.", Duration = 3})
       end
@@ -69,14 +108,16 @@ FPSTab:CreateToggle({
 
 NetworkTab:CreateSection("Trực quan thông số")
 
-local StatsLabel = NetworkTab:CreateLabel("Đang tải in4")
+local StatsLabel = NetworkTab:CreateLabel("Đang tải thông số...")
 
 task.spawn(function()
+    local RunService = game:GetService("RunService")
+    local Stats = game:GetService("Stats")
     while true do
         pcall(function()
-            local fps = math.round(1 / game:GetService("RunService").RenderStepped:Wait())
-            local ping = math.round(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
-            StatsLabel:Set("FPS hiện tại: " .. fps + 5 .. " | Ping hiện tại: " .. ping .. " ms")
+            local fps = math.round(1 / RunService.RenderStepped:Wait())
+            local ping = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+            StatsLabel:Set("FPS thực tế: " .. fps .. " | Ping: " .. ping .. " ms")
         end)
         task.wait(1)
     end
@@ -92,13 +133,13 @@ NetworkTab:CreateButton({
       end)
       Rayfield:Notify({
          Title = "Network Optimized",
-         Content = "k bt chc là ổn để ép mấy cái gói tin cho client!",
+         Content = "Đã ép gói tin!",
          Duration = 3,
       })
    end,
 })
 
-UtilityTab:CreateSection("anti afk")
+UtilityTab:CreateSection("Anti-AFK & RAM")
 
 UtilityTab:CreateToggle({
    Name = "Anti-AFK",
@@ -113,7 +154,7 @@ UtilityTab:CreateToggle({
             VirtualUser:CaptureController()
             VirtualUser:ClickButton2(Vector2.new())
          end)
-         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã bật anti AFK thành công!", Duration = 3})
+         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã bật anti AFK", Duration = 3})
       else
          if _G.AntiAFKConnection then
             _G.AntiAFKConnection:Disconnect()
@@ -125,14 +166,14 @@ UtilityTab:CreateToggle({
 })
 
 UtilityTab:CreateButton({
-   Name = "Dọn dẹp rác bộ nhớ (Clean RAM)",
+   Name = "Clean RAM",
    Callback = function()
       pcall(function()
          collectgarbage("collect")
       end)
       Rayfield:Notify({
          Title = "Đã dọn dẹp",
-         Content = "dọn ram r k bt có đc hay k!",
+         Content = "k bt sài đc hay k nx",
          Duration = 3,
       })
    end,
@@ -140,7 +181,7 @@ UtilityTab:CreateButton({
 
 Rayfield:LoadConfiguration()
 Rayfield:Notify({
-   Title = "Hub v0.3 Loaded!",
+   Title = "Hub v0.6 Loaded!",
    Content = "done",
    Duration = 5,
 })
