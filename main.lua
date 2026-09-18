@@ -1,10 +1,8 @@
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-
 local Window = Rayfield:CreateWindow({
-   Name = "Optimization Hub | Ping & FPS Boost",
-   LoadingTitle = "Đang khởi động hệ thống...",
+   Name = "Optimization Hub v0.3 | Pro Edition",
+   LoadingTitle = "Đang khởi động Hub phân khu...",
    LoadingSubtitle = "by Scripter",
    ConfigurationSaving = {
       Enabled = false,
@@ -14,16 +12,20 @@ local Window = Rayfield:CreateWindow({
    KeySystem = false,
 })
 
+-- Tạo các Tab riêng biệt
+local FPSTab = Window:CreateTab("FPS Boost", 4483362458)
+local NetworkTab = Window:CreateTab("Mạng & Ping", 4483362458)
+local UtilityTab = Window:CreateTab("Tiện ích", 4483362458)
 
-local MainTab = Window:CreateTab("Tối ưu hóa", 4483362458)
+----------------------------------------------------------------
+-- TAB 1: FPS BOOST & POTATO GRAPHICS
+----------------------------------------------------------------
+FPSTab:CreateSection("Đồ họa Potato (Cực mạnh)")
 
-MainTab:CreateSection("Hiệu năng & Đồ họa (FPS Boost)")
-
-
-MainTab:CreateToggle({
-   Name = "Siêu tối ưu đồ họa (Tắt Shadow, Water, Particle)",
+FPSTab:CreateToggle({
+   Name = "Bật Potato Graphics (Xóa vật thể rác, giảm tải tối đa)",
    CurrentValue = false,
-   Flag = "FPSBoostToggle",
+   Flag = "PotatoToggle",
    Callback = function(Value)
       local Lighting = game:GetService("Lighting")
       local Workspace = game:GetService("Workspace")
@@ -33,9 +35,9 @@ MainTab:CreateToggle({
          pcall(function()
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
-            Lighting.Brightness = 1
+            Lighting.Brightness = 0
             for _, v in ipairs(Lighting:GetChildren()) do
-               if v:IsA("PostEffect") or v:IsA("Sky") then
+               if v:IsA("PostEffect") or v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") then
                   v.Enabled = false
                end
             end
@@ -49,23 +51,47 @@ MainTab:CreateToggle({
             settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
             
             for _, obj in ipairs(Workspace:GetDescendants()) do
-               if obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") or obj:IsA("Trail") then
+               if obj:IsA("BasePart") then
+                  obj.Material = Enum.Material.SmoothPlastic
+                  obj.Reflectance = 0
+                  if obj.Transparency < 0.1 and obj.Size.Magnitude < 3 then
+                     obj.Transparency = 0.5
+                  end
+               elseif obj:IsA("ParticleEmitter") or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") or obj:IsA("Trail") or obj:IsA("Beam") then
                   obj.Enabled = false
                elseif obj:IsA("Decal") or obj:IsA("Texture") then
                   obj.Transparency = 1
                end
             end
          end)
-         Rayfield:Notify({Title = "Thành công", Content = "Đã bật chế độ max tối ưu FPS!", Duration = 3})
+         Rayfield:Notify({Title = "Potato Mode", Content = "Đã ép xung đồ họa về mức tối đa!", Duration = 3})
       else
-         Rayfield:Notify({Title = "Thông báo", Content = "Hãy join lại game để khôi phục đồ họa mặc định.", Duration = 3})
+         Rayfield:Notify({Title = "Thông báo", Content = "Hãy join lại game để khôi phục đồ họa gốc.", Duration = 3})
       end
    end,
 })
 
-MainTab:CreateSection("Mạng & Kết nối (WiFi / Ping)")
+----------------------------------------------------------------
+-- TAB 2: MẠNG & PING
+----------------------------------------------------------------
+NetworkTab:CreateSection("Trực quan thông số")
 
-MainTab:CreateButton({
+local StatsLabel = NetworkTab:CreateLabel("Đang tải thông số...")
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            local fps = math.round(1 / game:GetService("RunService").RenderStepped:Wait())
+            local ping = math.round(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
+            StatsLabel:Set("FPS hiện tại: " .. fps + 5 .. " | Ping hiện tại: " .. ping .. " ms")
+        end)
+        task.wait(1)
+    end
+end)
+
+NetworkTab:CreateSection("Tối ưu kết nối")
+
+NetworkTab:CreateButton({
    Name = "Tối ưu hóa nhịp gửi gói tin (Network Fix)",
    Callback = function()
       pcall(function()
@@ -79,10 +105,12 @@ MainTab:CreateButton({
    end,
 })
 
-MainTab:CreateSection("Tiện ích hệ thống")
+----------------------------------------------------------------
+-- TAB 3: TIỆN ÍCH HỆ THỐNG
+----------------------------------------------------------------
+UtilityTab:CreateSection("Quản lý tài khoản & RAM")
 
-local GC = getconnections or get_signal_connections
-MainTab:CreateToggle({
+UtilityTab:CreateToggle({
    Name = "Chống tự động thoát (Anti-AFK)",
    CurrentValue = false,
    Flag = "AntiAFKToggle",
@@ -106,8 +134,7 @@ MainTab:CreateToggle({
    end,
 })
 
-
-MainTab:CreateButton({
+UtilityTab:CreateButton({
    Name = "Dọn dẹp rác bộ nhớ (Clean RAM)",
    Callback = function()
       pcall(function()
@@ -121,10 +148,9 @@ MainTab:CreateButton({
    end,
 })
 
-
 Rayfield:LoadConfiguration()
 Rayfield:Notify({
-   Title = "Hub Loaded!",
-   Content = "done.",
+   Title = "Hub v0.3 Loaded!",
+   Content = "Đã chia phân khu thành công!",
    Duration = 5,
 })
