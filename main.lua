@@ -1,9 +1,9 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Optimization Hub v0.3 | Pro Edition",
-   LoadingTitle = "Đang khởi động Hub phân khu...",
-   LoadingSubtitle = "by Scripter",
+   Name = "Optimization Hub",
+   LoadingTitle = "load Hub ",
+   LoadingSubtitle = "by cat_isreal",
    ConfigurationSaving = {
       Enabled = false,
       FolderName = "OptHub",
@@ -12,15 +12,11 @@ local Window = Rayfield:CreateWindow({
    KeySystem = false,
 })
 
--- Tạo các Tab riêng biệt
 local FPSTab = Window:CreateTab("FPS Boost", 4483362458)
 local NetworkTab = Window:CreateTab("Mạng & Ping", 4483362458)
 local UtilityTab = Window:CreateTab("Tiện ích", 4483362458)
 
-----------------------------------------------------------------
--- TAB 1: FPS BOOST & POTATO GRAPHICS
-----------------------------------------------------------------
-FPSTab:CreateSection("Đồ họa Potato (Cực mạnh)")
+FPSTab:CreateSection(" Potato gra ")
 
 FPSTab:CreateToggle({
    Name = "Bật Potato Graphics (Xóa vật thể rác, giảm tải tối đa)",
@@ -64,19 +60,16 @@ FPSTab:CreateToggle({
                end
             end
          end)
-         Rayfield:Notify({Title = "Potato Mode", Content = "Đã ép xung đồ họa về mức tối đa!", Duration = 3})
+         Rayfield:Notify({Title = "Potato Mode", Content = "xong r giờ chs đi lag thì góp í thêm", Duration = 3})
       else
          Rayfield:Notify({Title = "Thông báo", Content = "Hãy join lại game để khôi phục đồ họa gốc.", Duration = 3})
       end
    end,
 })
 
-----------------------------------------------------------------
--- TAB 2: MẠNG & PING
-----------------------------------------------------------------
 NetworkTab:CreateSection("Trực quan thông số")
 
-local StatsLabel = NetworkTab:CreateLabel("Đang tải thông số...")
+local StatsLabel = NetworkTab:CreateLabel("Đang tải in4")
 
 task.spawn(function()
     while true do
@@ -92,26 +85,23 @@ end)
 NetworkTab:CreateSection("Tối ưu kết nối")
 
 NetworkTab:CreateButton({
-   Name = "Tối ưu hóa nhịp gửi gói tin (Network Fix)",
+   Name = "Tối ưu gửi gói tin (Network Fix)",
    Callback = function()
       pcall(function()
          settings():GetService("NetworkSettings").IncomingReplicationLag = 0
       end)
       Rayfield:Notify({
          Title = "Network Optimized",
-         Content = "Đã ép xung tần số phản hồi gói tin client!",
+         Content = "k bt chc là ổn để ép mấy cái gói tin cho client!",
          Duration = 3,
       })
    end,
 })
 
-----------------------------------------------------------------
--- TAB 3: TIỆN ÍCH HỆ THỐNG
-----------------------------------------------------------------
-UtilityTab:CreateSection("Quản lý tài khoản & RAM")
+UtilityTab:CreateSection("anti afk")
 
 UtilityTab:CreateToggle({
-   Name = "Chống tự động thoát (Anti-AFK)",
+   Name = "Anti-AFK",
    CurrentValue = false,
    Flag = "AntiAFKToggle",
    Callback = function(Value)
@@ -123,13 +113,13 @@ UtilityTab:CreateToggle({
             VirtualUser:CaptureController()
             VirtualUser:ClickButton2(Vector2.new())
          end)
-         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã bật chế độ chống AFK thành công!", Duration = 3})
+         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã bật anti AFK thành công!", Duration = 3})
       else
          if _G.AntiAFKConnection then
             _G.AntiAFKConnection:Disconnect()
             _G.AntiAFKConnection = nil
          end
-         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã tắt chống AFK.", Duration = 3})
+         Rayfield:Notify({Title = "Anti-AFK", Content = "Đã tắt AFK.", Duration = 3})
       end
    end,
 })
@@ -142,7 +132,7 @@ UtilityTab:CreateButton({
       end)
       Rayfield:Notify({
          Title = "Đã dọn dẹp",
-         Content = "Đã giải phóng bộ nhớ tạm cho máy!",
+         Content = "dọn ram r k bt có đc hay k!",
          Duration = 3,
       })
    end,
@@ -151,6 +141,6 @@ UtilityTab:CreateButton({
 Rayfield:LoadConfiguration()
 Rayfield:Notify({
    Title = "Hub v0.3 Loaded!",
-   Content = "Đã chia phân khu thành công!",
+   Content = "done",
    Duration = 5,
 })
