@@ -1,8 +1,8 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "Optimization Hub v0.6 | cat_isreal",
-   LoadingTitle = "đg tải ",
+   Name = "Optimization Hub v0.8 | cat_isreal",
+   LoadingTitle = " ",
    LoadingSubtitle = "by cat_isreal",
    ConfigurationSaving = {
       Enabled = false,
@@ -139,6 +139,78 @@ NetworkTab:CreateButton({
    end,
 })
 
+-- [MỤC TIỆN ÍCH & ESP]
+UtilityTab:CreateSection("ESP Player (Nhìn xuyên tường)")
+
+UtilityTab:CreateToggle({
+   Name = "Bật ESP Highlight",
+   CurrentValue = false,
+   Flag = "ESPToggle",
+   Callback = function(Value)
+      _G.ESPEnabled = Value
+      local Players = game:GetService("Players")
+      local LocalPlayer = Players.LocalPlayer
+
+      local function applyESP(character)
+         if not character then return end
+         local rootPart = character:WaitForChild("HumanoidRootPart", 5)
+         if not rootPart then return end
+
+         if _G.ESPEnabled then
+            if not character:FindFirstChild("OptHubESP") then
+               local highlight = Instance.new("Highlight")
+               highlight.Name = "OptHubESP"
+               highlight.Adornee = character
+               highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Màu đỏ nổi bật
+               highlight.FillTransparency = 0.5
+               highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+               highlight.OutlineTransparency = 0
+               highlight.Parent = character
+            end
+         else
+            local existingHighlight = character:FindFirstChild("OptHubESP")
+            if existingHighlight then
+               existingHighlight:Destroy()
+            end
+         end
+      end
+
+      for _, player in ipairs(Players:GetPlayers()) do
+         if player ~= LocalPlayer then
+            if player.Character then
+               applyESP(player.Character)
+            end
+            player.CharacterAdded:Connect(function(char)
+               if _G.ESPEnabled then
+                  applyESP(char)
+               end
+            end)
+         end
+      end
+
+      if not _G.ESPConnection and _G.ESPEnabled then
+         _G.ESPConnection = Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(char)
+               if _G.ESPEnabled then
+                  applyESP(char)
+               end
+            end)
+         end)
+      end
+
+      if Value then
+         Rayfield:Notify({Title = "ESP", Content = "Đã bật nhìn xuyên tường!", Duration = 3})
+      else
+         for _, player in ipairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("OptHubESP") then
+               player.Character.OptHubESP:Destroy()
+            end
+         end
+         Rayfield:Notify({Title = "ESP", Content = "Đã tắt ESP.", Duration = 3})
+      end
+   end,
+})
+
 UtilityTab:CreateSection("Anti-AFK & RAM")
 
 UtilityTab:CreateToggle({
@@ -181,7 +253,7 @@ UtilityTab:CreateButton({
 
 Rayfield:LoadConfiguration()
 Rayfield:Notify({
-   Title = "Hub v0.6 Loaded!",
+   Title = "Hub v0.8 Loaded!",
    Content = "done",
    Duration = 5,
 })
